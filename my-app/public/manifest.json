@@ -1,0 +1,8 @@
+{
+  "short_name": "GdxTS Game",
+  "name": "GDX TS Sample game",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
