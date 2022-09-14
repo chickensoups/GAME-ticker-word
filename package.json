@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "cra-template-gdxts": "^1.0.2",
+    "gdxts": "^0.1.20"
+  }
+}
