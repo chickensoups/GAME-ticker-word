@@ -1,5 +1,4 @@
 import {
-  BitmapFont,
   createGameLoop,
   createStage,
   createViewport,
@@ -12,6 +11,8 @@ import {CharItem, CharItemStatus} from './charItem';
 import {LevelData} from './levelData';
 import {LevelUtils} from './levelUtils';
 
+const BLOCK_MARGIN = 5;
+
 const initCharItems = async (levelData: LevelData, levelUtils: LevelUtils) => {
   const tileWidth: number = 100;
   const tileHeight: number = 100;
@@ -20,7 +21,7 @@ const initCharItems = async (levelData: LevelData, levelUtils: LevelUtils) => {
     let row = levelData.chars[i];
     for (let j = 0; j < row.length; j++) {
       const textureName = row[j];
-      const position = new Vector2(i * tileWidth, j * tileHeight);
+      const position = new Vector2(j * (tileHeight + BLOCK_MARGIN), i * (tileWidth + BLOCK_MARGIN));
       const characterIndex = levelUtils.characters.indexOf(textureName);
       const randomNumber = 0; // Math.floor(Math.random()*3);
       const charItem = new CharItem(j, i, textureName, position, tileWidth, tileHeight, randomNumber);
@@ -73,7 +74,7 @@ const init = async () => {
     const coord = inputHandler.getTouchedWorldCoord();
     if (touched) {
       for (let charItem of charItems) {
-        if(touchedCharItems.length > 2 || charItem.status === CharItemStatus.Corrected || touchedCharItemSet.has(charItem.getIndex()) || !charItem.isCoverPoint(coord)) {
+        if (touchedCharItems.length > 2 || charItem.status === CharItemStatus.Corrected || touchedCharItemSet.has(charItem.getIndex()) || !charItem.isCoverPoint(coord)) {
           continue;
         }
         if (touchedCharItems.length === 0) {
@@ -81,7 +82,7 @@ const init = async () => {
           touchedCharItemSet.add(charItem.getIndex());
           charItem.status = CharItemStatus.Selected
         } else if (touchedCharItems.length === 1) {
-          if(charItem.isSibling(touchedCharItems[0])) {
+          if (charItem.isSibling(touchedCharItems[0])) {
             touchedCharItems.push(charItem)
             touchedCharItemSet.add(charItem.getIndex());
             charItem.status = CharItemStatus.Selected
@@ -90,7 +91,7 @@ const init = async () => {
           }
         } else {
           const lastTouchedCharItem = touchedCharItems[touchedCharItems.length - 1]
-          if(!charItem.isSibling(lastTouchedCharItem) ||  charItem.getDirection(lastTouchedCharItem) !== touchedCharItemsDirection) {
+          if (!charItem.isSibling(lastTouchedCharItem) || charItem.getDirection(lastTouchedCharItem) !== touchedCharItemsDirection) {
             break;
           }
           touchedCharItems.push(charItem)
@@ -110,11 +111,16 @@ const init = async () => {
       selectedStr += touchedCharItem.textureName;
     }
     let selectedStrReversed = selectedStr.split('').reverse().join(''); // Handle the reversed case, eg: vnm or mnv is ok
-    for(let answer of levelData.answer) {
-      if(answer === selectedStr || answer === selectedStrReversed) {
+    for (let answer of levelData.answer) {
+      if (answer === selectedStr || answer === selectedStrReversed) {
         for (let touchedCharItem of touchedCharItems) {
           touchedCharItem.status = CharItemStatus.Corrected;
         }
+
+        // todo: Update answer ui text
+
+        // todo: If all answer had been satisfied then get next level
+
         break;
       }
     }
@@ -135,13 +141,11 @@ const init = async () => {
 
   const levelUtils = new LevelUtils();
   await levelUtils.getTextures(gl);
+
   const levelData: LevelData = levelUtils.getLevelData();
   const charItems = await initCharItems(levelData, levelUtils)
 
-  // const font = await BitmapFont.load(gl, './arialbm.fnt', Y_DOWN, false);
-  // font.draw(batch, 'dcm', 0,0, 100);
-
-  gl.clearColor(0, 0, 0, 1);
+  gl.clearColor(256, 256, 256, 1);
   createGameLoop((delta: number) => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     batch.setProjection(camera.projectionView.values);
@@ -156,8 +160,6 @@ const init = async () => {
     batch.end();
 
     // Draw level question
-
-
   });
 };
 
