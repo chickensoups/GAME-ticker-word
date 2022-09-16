@@ -1,4 +1,5 @@
 import {
+  BitmapFont,
   createGameLoop,
   createStage,
   createViewport,
@@ -72,7 +73,7 @@ const init = async () => {
     const coord = inputHandler.getTouchedWorldCoord();
     if (touched) {
       for (let charItem of charItems) {
-        if(charItem.status === CharItemStatus.Corrected || touchedCharItemSet.has(charItem.getIndex()) || !charItem.isCoverPoint(coord)) {
+        if(touchedCharItems.length > 2 || charItem.status === CharItemStatus.Corrected || touchedCharItemSet.has(charItem.getIndex()) || !charItem.isCoverPoint(coord)) {
           continue;
         }
         if (touchedCharItems.length === 0) {
@@ -136,6 +137,9 @@ const init = async () => {
   await levelUtils.getTextures(gl);
   const levelData: LevelData = levelUtils.getLevelData();
   const charItems = await initCharItems(levelData, levelUtils)
+
+  // const font = await BitmapFont.load(gl, './arialbm.fnt', Y_DOWN, false);
+  // font.draw(batch, 'dcm', 0,0, 100);
 
   gl.clearColor(0, 0, 0, 1);
   createGameLoop((delta: number) => {
